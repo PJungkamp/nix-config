@@ -18,7 +18,6 @@ in {
       uid = 1000;
       isNormalUser = true;
       description = "Philipp Jungkamp";
-      group = "pjungkamp";
       home = "/home/pjungkamp";
       extraGroups = [ "networkmanager" "wheel" "docker" ];
     };
