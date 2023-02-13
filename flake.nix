@@ -10,16 +10,30 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
   let
     # helper for building my configurations
     util = import ./util.nix { inherit nixpkgs home-manager; };
     # load home-manager modules from ./users/
-    userModules = util.mkUserModules [ "pjungkamp@yoga9" ];
+    userModules = util.mkUserModules [
+      "pjungkamp@yoga9"
+    ];
     # load nixos modules from ./hosts/
-    hostModules = util.mkHostModules [ "yoga9@x86_64-linux" ];
-  in {
+    hostModules = util.mkHostModules [
+      "yoga9@x86_64-linux"
+    ];
+    # make standalone homeConfigurations
     homeConfigurations = util.mkHomeConfigurations { inherit userModules inputs; };
+    # make nixosConfigurations with included home-manager
     nixosConfigurations = util.mkNixosConfigurations { inherit userModules hostModules inputs; };
+  in {
+    inherit
+      homeConfigurations
+      nixosConfigurations
+      # overlays
+      # packages
+      # nixosModules
+      # homeModules
+      ;
   };
 }

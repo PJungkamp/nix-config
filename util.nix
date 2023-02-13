@@ -3,7 +3,9 @@ let
   # helper functions
   inherit (nixpkgs.lib.attrsets) nameValuePair;
   inherit (nixpkgs.lib.strings) splitString;
+  inherit (nixpkgs.lib) mkForce;
   inherit (builtins) mapAttrs listToAttrs attrNames getAttr elem elemAt length filter;
+
   attrsToList =
     attrset: map
     (name: {
@@ -33,14 +35,16 @@ let
     in { inherit hostName system; };
 
   usersForHost =
-    hostName: users:
+    host: users:
     listToAttrs
       (map
         ({ name, value }:
-          nameValuePair (getAttr "userName" (splitUserHost name)) value
-        )
+          let inherit (splitUserHost name) userName;
+          in nameValuePair userName value)
         (filter
-          ({ name, ... }: getAttr "hostName" (splitUserHost name) == hostName)
+          ({ name, ... }:
+            let inherit (splitUserHost name) userName hostName;
+            in hostName == host || hostName == null && !elem "${userName}@${host}" (attrNames users))
           (attrsToList users)));
 
   mkUserModule = username: import ./users/${username}.nix;
@@ -58,7 +62,10 @@ let
   mkHomeConfiguration =
     { userModule, hostName, inputs }:
     home-manager.lib.homeManagerConfiguration {
-
+      extraSpecialArgs = inputs // { inherit hostName; system = null; };
+      modules = [
+        userModule
+      ];
     };
 
   mkNixosConfiguration =
@@ -81,11 +88,10 @@ let
             users = usersForHost hostName userModules;
             extraSpecialArgs = inputs // { inherit hostName system; };
             sharedModules = [
-              { config.home.stateVersion = config.system.stateVersion; }
+              { config.home.stateVersion = mkForce config.system.stateVersion; }
             ];
           };
         })
-        # add home-manager users as normal users to system configuration
       ];
     };
 
