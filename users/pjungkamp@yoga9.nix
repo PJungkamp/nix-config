@@ -15,6 +15,8 @@ in {
       wireshark
       evolution
       spotify
+
+      bottom
     ];
 
     programs.home-manager.enable = true;
@@ -30,6 +32,16 @@ in {
             name = "Open Terminal";
             binding = "XF86Calculator";
             command = "${pkgs.blackbox-terminal}/bin/blackbox";
+          };
+          bottom = {
+            name = "Open Process Viewer";
+            binding = "XF86Launch4";
+            command = "${pkgs.blackbox-terminal}/bin/blackbox -c ${pkgs.bottom}/bin/btm";
+          };
+          pavucontrol = {
+            name = "Open Sound Mixer";
+            binding = "XF86Launch2";
+            command = "${pkgs.pavucontrol}/bin/pavucontrol";
           };
           firefox = {
             name = "Open Firefox";
