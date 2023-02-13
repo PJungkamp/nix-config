@@ -1,5 +1,4 @@
-{ hostName, ... }:
-{
+{hostName, ...}: {
   # use flake hostname
   networking.hostName = hostName;
 

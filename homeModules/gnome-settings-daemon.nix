@@ -1,25 +1,28 @@
-{ config, lib, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  ...
+}:
+with lib; let
   inherit (attrsets) nameValuePair;
   inherit (builtins) listToAttrs attrNames attrValues elem filter;
 
-  attrsToList =
-    attrset: map
+  attrsToList = attrset:
+    map
     (name: {
       inherit name;
-      value = (getAttr name attrset);
+      value = getAttr name attrset;
     })
     (attrNames attrset);
 
   # all static keys spcified in the org.gnome.settings-daemon.plugins.media-keys schema
   #
-  # generate with bash:
-  #
+  # ```bash
   # SCHEMA=org.gnome.settings-daemon.plugins.media-keys
   # for KEY in $(gsettings list-keys $SCHEMA | grep -e '-static$') ; do
-  #   echo "$KEY = $(gsettings get $SCHEMA $KEY | tr \' \");"
+  #   echo "$KEY = $(gsettings get $SCHEMA $KEY | sed -e 's|\'|"|g' -e 's|,||g');"
   # done
+  # ```
   staticKeys = {
     battery-status-static = ["XF86Battery"];
     calculator-static = ["XF86Calculator"];
@@ -68,16 +71,17 @@ let
 
   cfg = config.dconf.gsd;
 
-  boundKeys = map ({ binding, ... }: binding)
+  boundKeys =
+    map ({binding, ...}: binding)
     (attrValues cfg.plugins.media-keys.customBindings);
 
   disabledStaticKeys =
     # static keys used in custom bindings
     optionals cfg.plugins.media-keys.overrideStatic
-      (map (key: key.name)
-        (filter
-          (key: any (binding: elem binding boundKeys) key.value)
-          (attrsToList staticKeys)));
+    (map (key: key.name)
+      (filter
+        (key: any (binding: elem binding boundKeys) key.value)
+        (attrsToList staticKeys)));
 
   customBindingModule = types.submodule {
     options = {
@@ -122,20 +126,29 @@ in {
   };
 
   config = {
-    dconf.settings = {
-      "org/gnome/settings-daemon/plugins/media-keys" = {
-        # remove the static binding preventing users from remapping the calculator key
-        calculator-static = [ "" ];
-        custom-keybindings = map
-          (name: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${name}/")
-          (attrNames cfg.plugins.media-keys.customBindings);
-      } // listToAttrs
-        (map
-          (key: nameValuePair key [ "" ])
-          disabledStaticKeys);
-    } // listToAttrs
+    dconf.settings =
+      {
+        "org/gnome/settings-daemon/plugins/media-keys" =
+          {
+            # remove the static binding preventing users from remapping the calculator key
+            calculator-static = [""];
+            custom-keybindings =
+              map
+              (name: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${name}/")
+              (attrNames cfg.plugins.media-keys.customBindings);
+          }
+          // listToAttrs
+          (map
+            (key: nameValuePair key [""])
+            disabledStaticKeys);
+      }
+      // listToAttrs
       (map
-        ({ name, value }: nameValuePair
+        ({
+          name,
+          value,
+        }:
+          nameValuePair
           "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${name}"
           value)
         (attrsToList cfg.plugins.media-keys.customBindings));

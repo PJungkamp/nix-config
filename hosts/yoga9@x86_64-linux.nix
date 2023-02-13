@@ -1,6 +1,9 @@
-{ lib, pkgs, ... }:
-let
-  defaultStopped = { wantedBy = lib.mkForce []; };
+{
+  lib,
+  pkgs,
+  ...
+}: let
+  defaultStopped = {wantedBy = lib.mkForce [];};
 in {
   imports = [
     ./modules/yoga9-hardware.nix
@@ -19,11 +22,11 @@ in {
       isNormalUser = true;
       description = "Philipp Jungkamp";
       home = "/home/pjungkamp";
-      extraGroups = [ "networkmanager" "wheel" "docker" ];
+      extraGroups = ["networkmanager" "wheel" "docker"];
     };
 
     # force suspend-then-hibernate
-    systemd.targets."suspend-then-hibernate".aliases = [ "suspend.target" ];
+    systemd.targets."suspend-then-hibernate".aliases = ["suspend.target"];
 
     # Set your time zone.
     time.timeZone = "Europe/Berlin";
@@ -89,7 +92,7 @@ in {
     nixpkgs.config.allowUnfree = true;
 
     # enable flakes
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    nix.settings.experimental-features = ["nix-command" "flakes"];
 
     # packages installed in system profile
     environment.systemPackages = with pkgs; [
@@ -110,11 +113,11 @@ in {
 
       # download only Iosevka
       fonts = with pkgs; [
-        (nerdfonts.override { fonts = [ "Iosevka" ]; })
+        (nerdfonts.override {fonts = ["Iosevka"];})
       ];
 
       # use Iosevka Term by default
-      fontconfig.defaultFonts.monospace = [ "Iosevka Nerd Font Mono" ];
+      fontconfig.defaultFonts.monospace = ["Iosevka Nerd Font Mono"];
     };
 
     # install fish shell

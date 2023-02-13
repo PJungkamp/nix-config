@@ -1,9 +1,12 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   config = {
     # initrd basic settings
-    boot.initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
-    boot.kernelModules = [ "kvm-intel" "i915" ];
+    boot.initrd.availableKernelModules = ["xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod"];
+    boot.kernelModules = ["kvm-intel" "i915"];
 
     # basic filesystems
     fileSystems = {
@@ -25,13 +28,13 @@
     swapDevices = [
       {
         device = "/swapfile";
-        size = 16*1024;
+        size = 16 * 1024;
       }
     ];
 
     # resume from swap
     boot.resumeDevice = "/dev/disk/by-uuid/ceb53129-af82-49a7-8e6e-727617ad0e55";
-    boot.kernelParams = [ "resume_offset=37664768" ];
+    boot.kernelParams = ["resume_offset=37664768"];
 
     # regulary trim for SSD health
     services.fstrim.enable = true;

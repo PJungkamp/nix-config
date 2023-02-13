@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   config = {
     boot.plymouth.enable = true;
     boot.initrd.verbose = false;
