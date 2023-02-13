@@ -69,7 +69,7 @@ with lib; let
     www-static = ["XF86WWW"];
   };
 
-  cfg = config.dconf.gsd;
+  cfg = config.gnome-settings-daemon;
 
   boundKeys =
     map ({binding, ...}: binding)
@@ -123,7 +123,7 @@ with lib; let
     };
   };
 in {
-  options.dconf.gsd.plugins = {
+  options.gnome-settings-daemon.plugins = {
     media-keys = {
       overrideStatic = mkOption {
         type = types.bool;

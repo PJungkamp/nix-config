@@ -15,39 +15,36 @@ in {
       wireshark
       evolution
       spotify
-
-      bottom
     ];
 
     programs.home-manager.enable = true;
     programs.firefox.enable = true;
     programs.bottom.enable = true;
 
-    dconf = {
-      enable = true;
-      gsd.plugins.media-keys = {
-        overrideStatic = true;
-        customBindings = {
-          terminal = {
-            name = "Open Terminal";
-            binding = "XF86Calculator";
-            command = "${pkgs.blackbox-terminal}/bin/blackbox";
-          };
-          bottom = {
-            name = "Open Process Viewer";
-            binding = "XF86Launch4";
-            command = "${pkgs.blackbox-terminal}/bin/blackbox -c ${pkgs.bottom}/bin/btm";
-          };
-          pavucontrol = {
-            name = "Open Sound Mixer";
-            binding = "XF86Launch2";
-            command = "${pkgs.pavucontrol}/bin/pavucontrol";
-          };
-          firefox = {
-            name = "Open Firefox";
-            binding = "Favorites";
-            command = "${pkgs.firefox}/bin/firefox";
-          };
+    dconf.enable = true;
+
+    gnome-settings-daemon.plugins.media-keys = {
+      overrideStatic = true;
+      customBindings = {
+        terminal = {
+          name = "Open Terminal";
+          binding = "XF86Calculator";
+          command = "${pkgs.blackbox-terminal}/bin/blackbox";
+        };
+        bottom = {
+          name = "Open Process Viewer";
+          binding = "XF86Launch4";
+          command = "${pkgs.blackbox-terminal}/bin/blackbox -c ${pkgs.bottom}/bin/btm";
+        };
+        pavucontrol = {
+          name = "Open Sound Mixer";
+          binding = "XF86Launch2";
+          command = "${pkgs.pavucontrol}/bin/pavucontrol";
+        };
+        firefox = {
+          name = "Open Firefox";
+          binding = "Favorites";
+          command = "${pkgs.firefox}/bin/firefox";
         };
       };
     };
