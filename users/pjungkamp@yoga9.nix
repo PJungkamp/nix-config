@@ -1,12 +1,13 @@
 {
   config,
   pkgs,
+  self,
   ...
 }: let
   userName = config.home.username;
   myVscode = pkgs.vscode.override {commandLineArgs = "--touch-events=";};
 in {
-  imports = [../homeModules/gnome-settings-daemon.nix];
+  imports = with self.homeModules; [gnome-settings-daemon];
   config = {
     home.packages = with pkgs; [
       blackbox-terminal

@@ -18,35 +18,37 @@
   } @ inputs: let
     # helper for building my configurations
     util = import ./util.nix {inherit nixpkgs home-manager;};
-    # load home-manager modules from ./users/
+    # make home-manager modules from ./users/
     userModules = util.mkUserModules [
       "pjungkamp@yoga9"
     ];
-    # load nixos modules from ./hosts/
+    # make nixos modules from ./hosts/
     hostModules = util.mkHostModules [
       "yoga9@x86_64-linux"
     ];
-    # make standalone homeConfigurations
-    homeConfigurations = util.mkHomeConfigurations {inherit userModules inputs;};
-    # make nixosConfigurations with included home-manager
-    nixosConfigurations = util.mkNixosConfigurations {inherit userModules hostModules inputs;};
+    # make home-manager modules from ./hostModules/
+    homeModules = util.mkHomeModules [
+      "gnome-settings-daemon"
+    ];
+    # make home-manager modules from ./nixosModules/
+    nixosModules =
+      util.mkNixosModules [
+      ];
     # format code using alejandra
     formatter = {
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
     };
+    # make standalone homeConfigurations
+    homeConfigurations = util.mkHomeConfigurations {inherit userModules inputs;};
+    # make nixosConfigurations with included home-manager
+    nixosConfigurations = util.mkNixosConfigurations {inherit userModules hostModules inputs;};
   in {
     inherit
       homeConfigurations
       nixosConfigurations
       formatter
-      # overlays
-      
-      # packages
-      
-      # nixosModules
-      
-      # homeModules
-      
+      nixosModules
+      homeModules
       ;
   };
 }

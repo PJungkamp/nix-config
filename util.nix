@@ -55,20 +55,28 @@
 
   mkHostModule = hostname: import ./hosts/${hostname}.nix;
 
-  mkUserModules = usernames:
-    listToAttrs
-    (map (name: nameValuePair name (mkUserModule name)) usernames);
+  mkHomeModule = moduleName: import ./homeModules/${moduleName}.nix;
 
-  mkHostModules = hostnames:
+  mkNixosModule = moduleName: import ./nixosModules/${moduleName}.nix;
+
+  mkMultiple = mkValue: names:
     listToAttrs
-    (map (name: nameValuePair name (mkHostModule name)) hostnames);
+    (map (name: nameValuePair name (mkValue name)) names);
+
+  mkUserModules = mkMultiple mkUserModule;
+
+  mkHostModules = mkMultiple mkHostModule;
+
+  mkHomeModules = mkMultiple mkHomeModule;
+
+  mkNixosModules = mkMultiple mkNixosModule;
 
   mkHomeConfiguration = {
     userModule,
     hostName,
     inputs,
   }:
-    home-manager.lib.homeManagerConfiguration {
+    home-manager.lib.homeConfiguration {
       extraSpecialArgs =
         inputs
         // {
@@ -144,6 +152,8 @@ in {
   inherit
     mkUserModules
     mkHostModules
+    mkHomeModules
+    mkNixosModules
     mkHomeConfigurations
     mkNixosConfigurations
     ;
