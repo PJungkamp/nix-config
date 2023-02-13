@@ -3,6 +3,7 @@ let
   userName = config.home.username;
   myVscode = pkgs.vscode.override { commandLineArgs = "--touch-events="; };
 in {
+  imports = [ ../homeModules/gnome-settings-daemon.nix ];
   config = {
     home.packages = with pkgs; [
       blackbox-terminal
@@ -18,18 +19,19 @@ in {
 
     dconf = {
       enable = true;
-      settings = {
-        "org/gnome/settings-daemon/plugins/media-keys" = {
-          # remove the static binding preventing users from remapping the calculator key
-          calculator-static = [ "" ];
-          custom-keybindings = [
-            "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/"
-          ];
-        };
-        "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal" = {
-          binding = "XF86Calculator";
-          command = "blackbox";
-          name = "Open Terminal";
+      gsd.plugins.media-keys = {
+        overrideStatic = true;
+        customBindings = {
+          terminal = {
+            name = "Open Terminal";
+            binding = "XF86Calculator";
+            command = "${pkgs.blackbox-terminal}/bin/blackbox";
+          };
+          firefox = {
+            name = "Open Firefox";
+            binding = "Favorites";
+            command = "${pkgs.firefox}/bin/firefox";
+          };
         };
       };
     };
