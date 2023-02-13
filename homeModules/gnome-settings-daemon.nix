@@ -91,7 +91,16 @@ with lib; let
             else [""])
           # only keep keys not bound otherwise
           (mapAttrs
-            (name: value: filter (key: !elem key boundKeys) value)
+            (name: value:
+              filter (key:
+                !elem (
+                  # add optional XF86 prefix to key before lookup
+                  if hasPrefix "XF86" key
+                  then key
+                  else "XF86${key}"
+                )
+                boundKeys)
+              value)
             staticKeys))));
 
   customBindingModule = types.submodule {
