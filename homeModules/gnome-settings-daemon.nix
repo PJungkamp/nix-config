@@ -75,13 +75,24 @@ with lib; let
     map ({binding, ...}: binding)
     (attrValues cfg.plugins.media-keys.customBindings);
 
-  disabledStaticKeys =
+  changedStaticKeys =
     # static keys used in custom bindings
     optionals cfg.plugins.media-keys.overrideStatic
-    (map (key: key.name)
-      (filter
-        (key: any (binding: elem binding boundKeys) key.value)
-        (attrsToList staticKeys)));
+    # only keep changed keys
+    (filter
+      (binding:
+        getAttr binding.name staticKeys != binding.value)
+      (attrsToList
+        # empty mappings should be [ "" ]
+        (mapAttrs
+          (name: value:
+            if length value != 0
+            then value
+            else [""])
+          # only keep keys not bound otherwise
+          (mapAttrs
+            (name: value: filter (key: !elem key boundKeys) value)
+            staticKeys))));
 
   customBindingModule = types.submodule {
     options = {
@@ -131,16 +142,12 @@ in {
         "org/gnome/settings-daemon/plugins/media-keys" =
           {
             # remove the static binding preventing users from remapping the calculator key
-            calculator-static = [""];
             custom-keybindings =
               map
               (name: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${name}/")
               (attrNames cfg.plugins.media-keys.customBindings);
           }
-          // listToAttrs
-          (map
-            (key: nameValuePair key [""])
-            disabledStaticKeys);
+          // listToAttrs changedStaticKeys;
       }
       // listToAttrs
       (map
