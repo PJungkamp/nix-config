@@ -78,6 +78,12 @@ in {
       drivers = [pkgs.hplip];
     };
 
+    # Enable mdns resolution and zeroconf detection
+    services.avahi = {
+      enable = true;
+      nssmdns = true;
+    };
+
     # k3s server
     services.k3s = {
       enable = true;
