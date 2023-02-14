@@ -56,24 +56,27 @@ in {
       };
     };
 
-    # Configure keymap
-    services.xserver = {
-      layout = "us";
-      xkbVariant = "altgr-intl";
-    };
-
     # use xkb keymap for console
     console.useXkbConfig = true;
 
-    # Enable the graphical environment
-    services.xserver.enable = true;
+    services.xserver = {
+      # Enable the graphical environment
+      enable = true;
 
-    # Enable the GNOME Desktop Environment.
-    services.xserver.displayManager.gdm.enable = true;
-    services.xserver.desktopManager.gnome.enable = true;
+      # Configure keymap
+      layout = "us";
+      xkbVariant = "altgr-intl";
+
+      # Enable the GNOME Desktop Environment.
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+    };
 
     # Enable CUPS to print documents.
-    services.printing.enable = true;
+    services.printing = {
+      enable = true;
+      drivers = [pkgs.hplip];
+    };
 
     # k3s server
     services.k3s = {
