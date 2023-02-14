@@ -29,6 +29,7 @@
     # make home-manager modules from ./hostModules/
     homeModules = util.mkHomeModules [
       "gnome-settings-daemon"
+      "gnome-shell-extensions"
     ];
     # make home-manager modules from ./nixosModules/
     nixosModules =

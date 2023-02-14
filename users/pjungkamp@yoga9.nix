@@ -7,23 +7,36 @@
   userName = config.home.username;
   myVscode = pkgs.vscode.override {commandLineArgs = "--touch-events=";};
 in {
-  imports = with self.homeModules; [gnome-settings-daemon];
+  imports = with self.homeModules; [
+    gnome-settings-daemon
+    gnome-shell-extensions
+  ];
   config = {
     home.packages = with pkgs; [
       blackbox-terminal
       adw-gtk3
       wireshark
       evolution
-      spotify
     ];
 
     programs.home-manager.enable = true;
     programs.firefox.enable = true;
     programs.bottom.enable = true;
 
-    dconf.enable = true;
+    dconf = {
+      enable = true;
+    };
 
-    gnome-settings-daemon.plugins.media-keys = {
+    programs.gnome-shell-extensions = {
+      enable = true;
+      extensions = with pkgs.gnomeExtensions; [
+        gsconnect
+        battery-indicator-icon
+        quick-settings-tweaker
+      ];
+    };
+
+    programs.gnome-settings-daemon.plugins.media-keys = {
       overrideStatic = true;
       customBindings = {
         terminal = {
