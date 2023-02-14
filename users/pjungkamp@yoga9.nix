@@ -33,6 +33,7 @@ in {
         gsconnect
         battery-indicator-icon
         quick-settings-tweaker
+        bluetooth-quick-connect
       ];
     };
 
