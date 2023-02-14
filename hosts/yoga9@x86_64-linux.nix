@@ -1,16 +1,16 @@
 {
   lib,
   pkgs,
+  self,
+  hostName,
   ...
 }: let
   defaultStopped = {wantedBy = lib.mkForce [];};
   bluezWithExperimental = pkgs.bluez.override {withExperimental = true;};
 in {
-  imports = [
-    ./modules/yoga9-hardware.nix
-    ./modules/silent-boot.nix
-    ./modules/systemd-boot.nix
-    ./modules/networkmanager.nix
+  imports = with self.nixosModules; [
+    hardware-yoga9
+    silent-boot
   ];
 
   config = {
@@ -48,6 +48,20 @@ in {
       };
     };
 
+    # plymouth boot splash
+    boot = {
+      plymouth.enable = true;
+      silent = true;
+    };
+
+    # systemd-boot config
+    boot.loader = {
+      systemd-boot.enable = true;
+      systemd-boot.configurationLimit = 12;
+      timeout = 0; # menu-hidden
+      efi.canTouchEfiVariables = true;
+    };
+
     # add experimental settings for bluetooth battery status
     hardware.bluetooth = {
       package = bluezWithExperimental;
@@ -72,11 +86,14 @@ in {
       desktopManager.gnome.enable = true;
     };
 
+    # use flake hostname
+    networking.hostName = hostName;
+
+    # Enable NetworkManager
+    networking.networkmanager.enable = true;
+
     # Enable CUPS to print documents.
-    services.printing = {
-      enable = true;
-      drivers = [pkgs.hplip];
-    };
+    services.printing.enable = true;
 
     # Enable mdns resolution and zeroconf detection
     services.avahi = {
