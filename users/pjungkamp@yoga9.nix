@@ -25,6 +25,18 @@ in {
 
     dconf = {
       enable = true;
+      settings = {
+        "org/gnome/shell/extensions/battery-indicator-icon" = {
+          status-style = "circle";
+          show-icon-text = 0;
+        };
+        "org/gnome/shell/extensions/quick-settings-tweaks" = {
+          volume-mixer-enabled = false;
+          notifications-enabled = false;
+          add-dnd-quick-toggle-enabled = false;
+          media-control-compact-mode = false;
+        };
+      };
     };
 
     programs.gnome-shell-extensions = {
