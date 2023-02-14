@@ -4,6 +4,7 @@
   ...
 }: let
   defaultStopped = {wantedBy = lib.mkForce [];};
+  bluezWithExperimental = pkgs.bluez.override {withExperimental = true;};
 in {
   imports = [
     ./modules/yoga9-hardware.nix
@@ -44,6 +45,14 @@ in {
         LC_PAPER = "de_DE.UTF-8";
         LC_TELEPHONE = "de_DE.UTF-8";
         LC_TIME = "de_DE.UTF-8";
+      };
+    };
+
+    # add experimental settings for bluetooth battery status
+    hardware.bluetooth = {
+      package = bluezWithExperimental;
+      settings = {
+        General.Experimental = true;
       };
     };
 

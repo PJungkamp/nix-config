@@ -66,6 +66,9 @@
       };
     };
 
+    # enable bluetooth
+    hardware.bluetooth.enable = true;
+
     # microcode updates
     hardware.cpu.intel.updateMicrocode = true;
     hardware.enableRedistributableFirmware = true;
