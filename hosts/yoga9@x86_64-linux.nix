@@ -23,7 +23,7 @@ in {
       isNormalUser = true;
       description = "Philipp Jungkamp";
       home = "/home/pjungkamp";
-      extraGroups = ["networkmanager" "wheel" "docker"];
+      extraGroups = ["networkmanager" "wheel" "docker" "wireshark"];
     };
 
     # force suspend-then-hibernate
