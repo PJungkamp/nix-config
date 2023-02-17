@@ -13,6 +13,13 @@ in {
   ];
   config = {
     home.packages = with pkgs; [
+      (writeShellScriptBin
+        "gnome-terminal"
+        ''
+          set -- "''${@:2}"
+          ARGS="''${@@Q}"
+          exec ${lib.meta.getExe blackbox-terminal} -c "''${ARGS}"
+        '')
       blackbox-terminal
       adw-gtk3
       wireshark
@@ -51,26 +58,28 @@ in {
 
     programs.gnome-settings-daemon.plugins.media-keys = {
       overrideStatic = true;
-      customBindings = {
+      customBindings = with pkgs; let
+        inherit (lib.meta) getExe;
+      in {
         terminal = {
           name = "Open Terminal";
           binding = "XF86Calculator";
-          command = "${pkgs.blackbox-terminal}/bin/blackbox";
+          command = "${getExe blackbox-terminal}";
         };
         bottom = {
           name = "Open Process Viewer";
           binding = "XF86Launch4";
-          command = "${pkgs.blackbox-terminal}/bin/blackbox -c ${pkgs.bottom}/bin/btm";
+          command = "${getExe blackbox-terminal} -c ${getExe bottom}";
         };
         pavucontrol = {
           name = "Open Sound Mixer";
           binding = "XF86Launch2";
-          command = "${pkgs.pavucontrol}/bin/pavucontrol";
+          command = "${getExe pavucontrol}";
         };
         firefox = {
           name = "Open Firefox";
           binding = "Favorites";
-          command = "${pkgs.firefox}/bin/firefox";
+          command = "${getExe firefox}";
         };
       };
     };
