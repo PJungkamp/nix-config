@@ -137,7 +137,7 @@ in {
         example = {
           terminal = {
             binding = "XF86Calculator";
-            command = "''${pkgs.blackbox-terminal}/bin/blackbox";
+            command = "\${pkgs.blackbox-terminal}/bin/blackbox";
             name = "Open Terminal";
           };
         };
