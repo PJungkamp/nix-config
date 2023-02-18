@@ -4,13 +4,20 @@
   self,
   hostName,
   ...
-}: let
-  defaultStopped = {wantedBy = lib.mkForce [];};
-  bluezWithExperimental = pkgs.bluez.override {withExperimental = true;};
-in {
+}: {
   imports = with self.nixosModules; [
-    hardware-yoga9
-    silent-boot
+    ./modules/base.nix
+    ./modules/bluetooth.nix
+    ./modules/dev.nix
+    ./modules/graphical.nix
+    ./modules/i18n.nix
+    ./modules/keymap.nix
+    ./modules/network.nix
+    ./modules/nix.nix
+    ./modules/pipewire.nix
+    ./modules/plymouth.nix
+    ./modules/sogno.nix
+    ./modules/systemd-boot.nix
   ];
 
   config = {
@@ -26,146 +33,83 @@ in {
       extraGroups = ["networkmanager" "wheel" "docker" "wireshark"];
     };
 
-    # force suspend-then-hibernate
+    # force suspend-then-hibernate.
     systemd.targets."suspend-then-hibernate".aliases = ["suspend.target"];
 
-    # Set your time zone.
+    # my time zone.
     time.timeZone = "Europe/Berlin";
 
-    # Select internationalisation properties.
-    i18n = {
-      defaultLocale = "en_US.UTF-8";
-      extraLocaleSettings = {
-        LC_ADDRESS = "de_DE.UTF-8";
-        LC_IDENTIFICATION = "de_DE.UTF-8";
-        LC_MEASUREMENT = "de_DE.UTF-8";
-        LC_MONETARY = "de_DE.UTF-8";
-        LC_NAME = "de_DE.UTF-8";
-        LC_NUMERIC = "de_DE.UTF-8";
-        LC_PAPER = "de_DE.UTF-8";
-        LC_TELEPHONE = "de_DE.UTF-8";
-        LC_TIME = "de_DE.UTF-8";
-      };
-    };
+    programs.wireshark.enable = true;
 
-    # plymouth boot splash
-    boot = {
-      plymouth.enable = true;
-      silent = true;
-    };
-
-    # systemd-boot config
-    boot.loader = {
-      systemd-boot.enable = true;
-      systemd-boot.configurationLimit = 12;
-      timeout = 0; # menu-hidden
-      efi.canTouchEfiVariables = true;
-    };
-
-    # add experimental settings for bluetooth battery status
-    hardware.bluetooth = {
-      package = bluezWithExperimental;
-      settings = {
-        General.Experimental = true;
-      };
-    };
-
-    # use xkb keymap for console
-    console.useXkbConfig = true;
-
-    services.xserver = {
-      # Enable the graphical environment
-      enable = true;
-
-      # Configure keymap
-      layout = "us";
-      xkbVariant = "altgr-intl";
-
-      # Enable the GNOME Desktop Environment.
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
-    };
-
-    # use flake hostname
-    networking.hostName = hostName;
-
-    # Enable NetworkManager
-    networking.networkmanager.enable = true;
-
-    # Enable CUPS to print documents.
-    services.printing.enable = true;
-
-    # Enable mdns resolution and zeroconf detection
-    services.avahi = {
-      enable = true;
-      nssmdns = true;
-    };
-
-    # k3s server
-    services.k3s = {
-      enable = true;
-      role = "server";
-    };
-    systemd.services."k3s" = defaultStopped;
-
-    # docker daemon
-    virtualisation.docker.enable = true;
-    systemd.services."docker" = defaultStopped;
-
-    # Enable sound with pipewire.
-    sound.enable = true;
-    hardware.pulseaudio.enable = false;
-    security.rtkit.enable = true;
-    services.pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
-
-    # allow unfree packages
-    nixpkgs.config.allowUnfree = true;
-
-    # enable flakes
-    nix.settings.experimental-features = ["nix-command" "flakes"];
-
-    # packages installed in system profile
-    environment.systemPackages = with pkgs; [
-      blackbox-terminal
-      kakoune
-      k3s
-      kubernetes-helm
-    ];
-
-    environment.variables = with pkgs; {
-      EDITOR = "kak";
-      KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
-      NIXOS_OZONE_WL = "1";
-    };
-
-    fonts = {
-      enableDefaultFonts = true;
-
-      # download only Iosevka
-      fonts = with pkgs; [
-        (nerdfonts.override {fonts = ["Iosevka"];})
-      ];
-
-      # use Iosevka Term by default
-      fontconfig.defaultFonts.monospace = ["Iosevka Nerd Font Mono"];
-    };
-
-    # install fish shell
-    programs.fish.enable = true;
-
-    # use nix-index to find packages for missing commands
-    programs.nix-index.enable = true;
-    programs.command-not-found.enable = false;
-
-    # Enable the OpenSSH daemon.
+    # enable the OpenSSH daemon
     # services.openssh.enable = true;
 
-    # Disable Firewall
+    # disable firewall
     networking.firewall.enable = false;
+
+    boot = {
+      initrd.availableKernelModules = ["xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod"];
+      kernelModules = ["kvm-intel"];
+      loader.efi.efiSysMountPoint = "/boot/efi";
+      kernelPackages = pkgs.linuxPackages_latest;
+      # resume from swapfile
+      resumeDevice = "/dev/disk/by-uuid/ceb53129-af82-49a7-8e6e-727617ad0e55";
+      kernelParams = ["resume_offset=37664768"];
+    };
+
+    # basic filesystems
+    fileSystems = {
+      "/" = {
+        device = "/dev/disk/by-uuid/ceb53129-af82-49a7-8e6e-727617ad0e55";
+        fsType = "ext4";
+      };
+      "/boot/efi" = {
+        device = "/dev/disk/by-uuid/247B-CC47";
+        fsType = "vfat";
+      };
+    };
+
+    # 16GB swapfile
+    swapDevices = [
+      {
+        device = "/swapfile";
+        size = 16 * 1024;
+      }
+    ];
+
+    services = {
+      # regulary trim for SSD health
+      fstrim.enable = true;
+      # Intel Thermald cooling daemon
+      thermald.enable = true;
+      # TLP power saving daemon
+      power-profiles-daemon.enable = false;
+      tlp = {
+        enable = true;
+        settings = {
+          # networking
+          RESTORE_DEVICE_STATE_ON_STARTUP = 1;
+          DEVICES_TO_DISABLE_ON_LAN_CONNECT = "wifi";
+          DEVICES_TO_ENABLE_ON_LAN_DISCONNECT = "wifi";
+          # CPU
+          CPU_ENERGY_PERF_POLICY_ON_AC = "default";
+          CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+          CPU_HWP_DYNAMIC_BOOST_ON_AC = 1;
+          CPU_HWP_DYNAMIC_BOOST_ON_BAT = 1;
+          CPU_MAX_PERF_ON_AC = 100;
+          CPU_MIN_PERF_ON_AC = 0;
+          CPU_MAX_PERF_ON_BAT = 30;
+          CPU_MIN_PERF_ON_BAT = 0;
+          # platform profile
+          PLATFORM_PROFILE_ON_AC = "balanced";
+          PLATFORM_PROFILE_ON_BAT = "low-power";
+        };
+      };
+    };
+
+    hardware = {
+      cpu.intel.updateMicrocode = true;
+      enableRedistributableFirmware = true; # WiFi firmware
+    };
   };
 }

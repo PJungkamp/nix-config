@@ -1,22 +1,15 @@
-{
-  config,
-  lib,
-  ...
-}:
-with lib; let
-  enabled = config.boot.silent;
-in {
-  options = {
-    boot.silent = mkOption {
-      type = types.bool;
-      default = false;
-    };
-  };
-
-  config = mkIf enabled {
+{hostName, ...}: {
+  config = {
     boot = {
+      plymouth.enable = true;
       initrd.verbose = false;
       consoleLogLevel = 0;
+      kernelModules =
+        {
+          yoga9 = ["i915"];
+        }
+        .${hostName}
+        or [];
       kernelParams = [
         "quiet"
         "rd.udev.log_level=3"

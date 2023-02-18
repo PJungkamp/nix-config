@@ -32,10 +32,9 @@
       "gnome-shell-extensions"
     ];
     # make home-manager modules from ./nixosModules/
-    nixosModules = util.mkNixosModules [
-      "silent-boot"
-      "hardware-yoga9"
-    ];
+    nixosModules =
+      util.mkNixosModules [
+      ];
     # format code using alejandra
     formatter = {
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
