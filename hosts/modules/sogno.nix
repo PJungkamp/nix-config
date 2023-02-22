@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   config = {
     # k3s server
     services.k3s = {
@@ -16,6 +20,6 @@
     };
 
     # disable k3s on boot
-    systemd.services."k3s".wantedBy = [];
+    systemd.services."k3s".wantedBy = lib.mkForce [];
   };
 }

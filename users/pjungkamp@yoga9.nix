@@ -20,7 +20,6 @@ in {
           ARGS="''${@@Q}"
           exec ${lib.meta.getExe blackbox-terminal} -c "''${ARGS}"
         '')
-      blackbox-terminal
       adw-gtk3
       wireshark
       evolution
@@ -29,6 +28,14 @@ in {
     programs.home-manager.enable = true;
     programs.firefox.enable = true;
     programs.bottom.enable = true;
+
+    services.gnome-keyring.enable = true;
+
+    xdg.configFile = {
+      "docker/config.json".text = builtins.toJSON {
+        credsStore = "secretservice";
+      };
+    };
 
     dconf = {
       enable = true;
@@ -134,16 +141,10 @@ in {
         # fish configuration
         set fish_greeting ""
       '';
-      functions = {
-        exit = ''
-          test "$(count $argv)" = 0
-          and builtin exit 0
-          or builtin exit $argv
-        '';
-      };
       shellAbbrs = {
+        e = "exit 0";
+        exit = "exit 0";
         c = "clear";
-        e = "exit";
         ga = "git add";
         gc = "git commit";
         gs = "git status";
