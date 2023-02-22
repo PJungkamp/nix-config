@@ -18,6 +18,12 @@
   } @ inputs: let
     # helper for building my configurations
     util = import ./util.nix {inherit nixpkgs home-manager;};
+    # make packages
+    packages = util.mkPackages {
+      x86_64-linux = [
+        "ideapad-wmi-usage-mode"
+      ];
+    };
     # make home-manager modules from ./users/
     userModules = util.mkUserModules [
       "pjungkamp@yoga9"
@@ -48,6 +54,7 @@
       formatter
       nixosModules
       homeModules
+      packages
       ;
   };
 }

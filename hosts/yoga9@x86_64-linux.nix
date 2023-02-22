@@ -2,6 +2,7 @@
   lib,
   pkgs,
   self,
+  system,
   hostName,
   ...
 }: {
@@ -47,14 +48,15 @@
     # disable firewall
     networking.firewall.enable = false;
 
-    boot = {
+    boot = rec {
       initrd.availableKernelModules = ["xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod"];
-      kernelModules = ["kvm-intel"];
+      extraModulePackages = with self.packages.${system}; [(ideapad-wmi-usage-mode.override {kernel = kernelPackages.kernel;})];
+      kernelModules = ["kvm-intel" "ideapad-wmi-usage-mode"];
       loader.efi.efiSysMountPoint = "/boot/efi";
       kernelPackages = pkgs.linuxPackages_latest;
       # resume from swapfile
       resumeDevice = "/dev/disk/by-uuid/ceb53129-af82-49a7-8e6e-727617ad0e55";
-      kernelParams = ["resume_offset=37664768"];
+      kernelParams = ["iwlwifi.power_save=1" "resume_offset=37664768"];
     };
 
     # basic filesystems
@@ -76,6 +78,8 @@
         size = 16 * 1024;
       }
     ];
+
+    zramSwap.enable = true;
 
     services = {
       # regulary trim for SSD health
@@ -103,6 +107,9 @@
           # platform profile
           PLATFORM_PROFILE_ON_AC = "balanced";
           PLATFORM_PROFILE_ON_BAT = "low-power";
+          # PCIe ASPM
+          PCIE_ASPM_ON_AC = "performance";
+          PCIE_ASPM_ON_BAT = "powersupersave";
         };
       };
     };

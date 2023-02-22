@@ -51,6 +51,16 @@
           hostName == host || hostName == null && !elem "${userName}@${host}" (attrNames users))
         (attrsToList users)));
 
+  mkPackage = system: package: let
+    inherit (nixpkgs.legacyPackages.${system}) callPackage;
+  in
+    callPackage ./packages/${package}.nix {};
+
+  mkPackages = packages:
+    mapAttrs
+    (system: names: listToAttrs (map (name: nameValuePair name (mkPackage system name)) names))
+    packages;
+
   mkUserModule = username: import ./users/${username}.nix;
 
   mkHostModule = hostname: import ./hosts/${hostname}.nix;
@@ -150,6 +160,7 @@
       (attrsToList hostModules));
 in {
   inherit
+    mkPackages
     mkUserModules
     mkHostModules
     mkHomeModules
