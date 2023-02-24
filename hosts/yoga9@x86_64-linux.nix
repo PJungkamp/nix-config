@@ -117,6 +117,11 @@
     hardware = {
       cpu.intel.updateMicrocode = true;
       enableRedistributableFirmware = true; # WiFi firmware
+
+      opengl = {
+        enable = true;
+        extraPackages = with pkgs; [intel-media-driver];
+      };
     };
   };
 }
