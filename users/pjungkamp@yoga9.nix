@@ -93,6 +93,14 @@ in {
 
     programs.ssh = {
       enable = true;
+      forwardAgent = true;
+      matchBlocks = {
+        "rasppi" = {
+          hostname = "mg6mep16gbupru0w.myfritz.net";
+          user = "pjungkamp";
+          port = 26839;
+        };
+      };
     };
 
     programs.git = {
@@ -138,8 +146,8 @@ in {
     programs.fish = {
       enable = true;
       shellInit = ''
-        # fish configuration
         set fish_greeting ""
+        set fish_key_bindings fish_vi_key_bindings
       '';
       shellAbbrs = {
         e = "exit 0";
@@ -156,7 +164,7 @@ in {
       initExtra = ''
         # PATH of parent process
         PPATH="$(
-          cat /proc/$PPID/environ | while IFS= read -d ''' ENV ; do
+          cat 2>/dev/null /proc/$PPID/environ | while IFS= read -d ''' ENV ; do
             [[ "$ENV" == PATH=* ]] && printf %s "''${ENV#PATH=}"
           done
         )"
