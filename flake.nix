@@ -22,6 +22,8 @@
     packages = util.mkPackages {
       x86_64-linux = [
         "ideapad-wmi-usage-mode"
+        "edu-sync-cli"
+        "sciebo-client"
       ];
     };
     # make home-manager modules from ./users/
