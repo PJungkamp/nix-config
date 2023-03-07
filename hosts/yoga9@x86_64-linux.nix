@@ -7,6 +7,7 @@
   ...
 }: {
   imports = with self.nixosModules; [
+    sciebo-client
     ./modules/base.nix
     ./modules/bluetooth.nix
     ./modules/dev.nix
@@ -40,6 +41,7 @@
     time.timeZone = "Europe/Berlin";
 
     programs.wireshark.enable = true;
+    programs.sciebo-client.enable = true;
 
     # enable the OpenSSH daemon
     # services.openssh.enable = true;

@@ -2,6 +2,7 @@
   config,
   pkgs,
   self,
+  system,
   ...
 }: let
   userName = config.home.username;
@@ -12,18 +13,22 @@ in {
     gnome-shell-extensions
   ];
   config = {
-    home.packages = with pkgs; [
-      (writeShellScriptBin
-        "gnome-terminal"
-        ''
-          set -- "''${@:2}"
-          ARGS="''${@@Q}"
-          exec ${lib.meta.getExe blackbox-terminal} -c "''${ARGS}"
-        '')
-      adw-gtk3
-      wireshark
-      evolution
-    ];
+    home.packages =
+      (with pkgs; [
+        (writeShellScriptBin
+          "gnome-terminal"
+          ''
+            set -- "''${@:2}"
+            ARGS="''${@@Q}"
+            exec ${lib.meta.getExe blackbox-terminal} -c "''${ARGS}"
+          '')
+        adw-gtk3
+        wireshark
+        evolution
+      ])
+      ++ (with self.packages.${system}; [
+        edu-sync-cli
+      ]);
 
     programs.home-manager.enable = true;
     programs.firefox.enable = true;

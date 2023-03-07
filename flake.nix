@@ -40,7 +40,9 @@
       "gnome-shell-extensions"
     ];
     # make home-manager modules from ./nixosModules/
-    nixosModules = util.mkNixosModules [];
+    nixosModules = util.mkNixosModules [
+      "sciebo-client"
+    ];
     # format code using alejandra
     formatter = {
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;

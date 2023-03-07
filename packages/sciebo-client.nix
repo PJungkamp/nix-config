@@ -235,6 +235,7 @@ in
 
     installPhase = ''
       mkdir -p $out
+      cp -r etc $out/
       cp -r usr/share $out/
       cp -r opt/ownCloud/sciebo/lib $out/
       cp -r opt/ownCloud/sciebo/bin $out/
