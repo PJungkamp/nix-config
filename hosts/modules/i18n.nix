@@ -2,6 +2,16 @@
 # Select internationalisation properties.
 {
   config = {
+    # use xkb keymap for console
+    console.useXkbConfig = true;
+
+    # set xkb keymap
+    services.xserver = {
+      layout = "us";
+      xkbVariant = "altgr-intl";
+    };
+
+    # set locale
     i18n = {
       defaultLocale = "en_US.UTF-8";
       extraLocaleSettings = {

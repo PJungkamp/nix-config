@@ -12,7 +12,6 @@
     ./modules/dev.nix
     ./modules/graphical.nix
     ./modules/i18n.nix
-    ./modules/keymap.nix
     ./modules/network.nix
     ./modules/nix.nix
     ./modules/pipewire.nix
