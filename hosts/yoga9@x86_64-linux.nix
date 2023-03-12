@@ -17,6 +17,7 @@
     ./modules/nix.nix
     ./modules/pipewire.nix
     ./modules/plymouth.nix
+    ./modules/polkit.nix
     ./modules/sogno.nix
     ./modules/systemd-boot.nix
   ];

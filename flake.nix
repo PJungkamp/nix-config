@@ -8,6 +8,10 @@
     # home-manager configuration
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # pks polkit sudo replacement
+    pks.url = "github:PJungkamp/pks";
+    pks.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
@@ -19,13 +23,16 @@
     # helper for building my configurations
     util = import ./util.nix {inherit nixpkgs home-manager;};
     # make packages
-    packages = util.mkPackages {
-      x86_64-linux = [
-        "ideapad-wmi-usage-mode"
-        "edu-sync-cli"
-        "sciebo-client"
-      ];
-    };
+    packages =
+      util.recursiveUpdate (util.mkPackages {
+        x86_64-linux = [
+          "ideapad-wmi-usage-mode"
+          "edu-sync-cli"
+          "sciebo-client"
+        ];
+      }) {
+        x86_64-linux.pks = inputs.pks.packages.x86_64-linux.default;
+      };
     # make home-manager modules from ./users/
     userModules = util.mkUserModules [
       "pjungkamp@yoga9"

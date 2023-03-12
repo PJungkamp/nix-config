@@ -23,7 +23,6 @@ in {
             exec ${lib.meta.getExe blackbox-terminal} -c "''${ARGS}"
           '')
         adw-gtk3
-        wireshark
         evolution
       ])
       ++ (with self.packages.${system}; [

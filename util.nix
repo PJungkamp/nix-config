@@ -4,7 +4,7 @@
 }: let
   inherit (nixpkgs.lib.attrsets) nameValuePair;
   inherit (nixpkgs.lib.strings) splitString;
-  inherit (nixpkgs.lib) mkForce;
+  inherit (nixpkgs.lib) mkForce recursiveUpdate;
   inherit (builtins) mapAttrs listToAttrs attrNames getAttr elem elemAt length filter;
 
   attrsToList = attrset:
@@ -160,6 +160,7 @@
       (attrsToList hostModules));
 in {
   inherit
+    recursiveUpdate
     mkPackages
     mkUserModules
     mkHostModules
